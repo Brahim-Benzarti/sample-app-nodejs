@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { useSession } from '../context/session';
-import { ErrorProps, ListItem, Order, QueryParams, ShippingAndProductsInfo } from '../types';
+import { ErrorProps, ListItem, Order, QueryParams, ShippingAndProductsInfo, WebHooks } from '../types';
 
 async function fetcher(url: string, query: string) {
     const res = await fetch(`${url}?${query}`);
@@ -91,4 +91,18 @@ export const useShippingAndProductsInfo = (orderId: number) => {
         isLoading: !data && !error,
         error,
     };
+}
+
+export const useWeebhooks= ()=>{
+    const { context }= useSession();
+    const params = new URLSearchParams({ context }).toString();
+    const shouldFetch = context;
+
+    const { data, error } = useSWR<WebHooks, ErrorProps>(shouldFetch?['/api/webhooks', params]: null, fetcher)
+
+    return {
+        webhooks: data,
+        isLoading: !data && !error,
+        error,
+    }
 }

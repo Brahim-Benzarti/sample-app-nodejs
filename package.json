@@ -21,6 +21,7 @@
   "dependencies": {
     "@bigcommerce/big-design": "^0.32.1",
     "@bigcommerce/big-design-theme": "^0.15.0",
+    "dotenv": "^16.0.2",
     "firebase": "^9.9.2",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
@@ -28,6 +29,7 @@
     "node-bigcommerce": "github:bigcommerce/node-bigcommerce",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "recurly": "^4.22.0",
     "styled-components": "^5.3.5",
     "swr": "^0.5.7"
   },
