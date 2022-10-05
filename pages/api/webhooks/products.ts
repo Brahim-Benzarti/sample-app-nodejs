@@ -6,7 +6,7 @@ import * as recurlyClient from "recurly";
 
 export default async function products(req: NextApiRequest, res: NextApiResponse) {
     const {
-        query: { after },
+        query: { updated_after, webhook_id },
         body,
         method,
     } = req;
@@ -19,9 +19,10 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
 
         switch (method) {
             case 'GET': {
+                console.log("Syncing products")
                 let url= '/catalog/products?include=variants';
-                if(parseInt(after as string)>0) url+=`&date_modified:min=${new Date(parseInt(after as string)).toISOString()}`
-                //todo default sync
+                let specifiTime= parseInt(updated_after as string);
+                if(specifiTime > 0 && specifiTime < new Date().getTime()) url+=`&date_modified:min=${new Date(specifiTime).toISOString().split("T")[0]}`
                 const bcProducts: BCProducts = await handlePagination(bigcommerce, url)
                 let recurlyProdcutsChecks= bcProducts.data.flatMap((product)=>product.variants.map((variant)=>{return `code-${variant.id}`}))
                 let recurlyProdcutsOperations= bcProducts.data.flatMap((product)=>product.variants.map((variant)=>{
@@ -54,15 +55,41 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
                         if(res.reason instanceof recurlyClient.errors.NotFoundError) return recurly.createItem(recurlyProdcutsOperations[index].handleCreating.body)
                     }
                 }));
-                res.status(200).json(recurlyHandlingResults);
+                // todo more descriptive response usefull when handling unexpected errors
+                res.status(200).json({operation_successfull: recurlyHandlingResults.every((res)=> res.status=='fulfilled')});
                 break;
             }
             case 'POST': {
                 //todo handle webhookpayload for all possible scopes
+                console.log("Received & Handling webhook")
+                break
+            }
+            case 'PATCH': {
+                console.log(`Updating webhook ${webhook_id}, setting it ${body.is_active}`)
+                await bigcommerce.put(`/hooks/${webhook_id}`,{
+                    scope: "store/product/*",
+                    destination: `${process.env.APP_DOMAIN}/api/webhooks/products`,
+                    is_active: body.is_active,
+                    events_history_enabled: true
+                })
+                res.status(200).json({operation_successfull: true})
+                break
+            }
+            case 'PUT': {
+                // todo create weebhook
+                // todo use the secure way
+                console.log("Creating webhook")
+                await bigcommerce.post('/hooks',{
+                    scope: "store/product/*",
+                    destination: `${process.env.APP_DOMAIN}/api/webhooks/products`,
+                    is_active: true,
+                    events_history_enabled: true
+                })
+                res.status(200).json({operation_successfull: true})
                 break
             }
             default: {
-                res.setHeader('Allow', ['GET','POST']);
+                res.setHeader('Allow', ['GET', 'POST', 'PUT', 'PATCH']);
                 res.status(405).end(`Method ${method} Not Allowed`);
             }
         }
