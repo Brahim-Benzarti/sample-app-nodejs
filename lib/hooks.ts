@@ -93,16 +93,17 @@ export const useShippingAndProductsInfo = (orderId: number) => {
     };
 }
 
-export const useWeebhooks= ()=>{
+export const useWebhooks= ()=>{
     const { context }= useSession();
     const params = new URLSearchParams({ context }).toString();
     const shouldFetch = context;
 
-    const { data, error } = useSWR<WebHooks, ErrorProps>(shouldFetch?['/api/webhooks', params]: null, fetcher)
+    const { data, error, mutate: mutateWebhooks } = useSWR<WebHooks, ErrorProps>(shouldFetch?['/api/webhooks', params]: null, fetcher)
 
     return {
         webhooks: data,
         isLoading: !data && !error,
         error,
+        mutateWebhooks,
     }
 }
