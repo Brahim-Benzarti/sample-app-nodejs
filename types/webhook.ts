@@ -1,3 +1,5 @@
+import { Status } from "./misc";
+
 export interface WebHooks {
   data: Webhook[];
   meta: Meta;
@@ -32,8 +34,15 @@ export interface Webhook {
   is_active:   boolean;
   created_at:  number;
   updated_at:  number;
+  addon:       Addon;
 }
 
 export interface Headers {
+  [key: string]: unknown;
+}
+
+export interface Addon{
+  step?: number;
+  stats?: Status[];
   [key: string]: unknown;
 }

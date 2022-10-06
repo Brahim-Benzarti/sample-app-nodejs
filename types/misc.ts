@@ -1,3 +1,5 @@
+import { Badges } from "../enums/bigdesign";
+
 export interface PaginateAble {
   data: any[];
   meta: Meta;
@@ -24,4 +26,11 @@ export interface Links {
   previous: string;
   current:  string;
   next:     string;
+}
+
+export interface Status{
+  message:    string;
+  label:      string;
+  badge:      Badges;
+  error?:     string;
 }
