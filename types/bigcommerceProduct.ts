@@ -2,7 +2,10 @@ export interface BCProducts {
   data: Datum[];
   meta?: Meta;
 }
-
+export interface BCProduct {
+  data: Datum;
+  meta?: Meta;
+}
 export interface Datum {
   id:                              number;
   name:                            string;

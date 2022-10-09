@@ -42,6 +42,19 @@ export function bigcommerceClient(accessToken: string, storeHash: string, apiVer
     });
 }
 
+// Handle webhook requests
+// TODO: use security measures
+export async function bigcommerceWebhookClient(storeHash: string, apiVersion = 'v3') {
+    return new BigCommerce({
+        clientId: CLIENT_ID,
+        accessToken: await db.getStoreToken(storeHash),
+        storeHash,
+        responseType: 'json',
+        apiVersion,
+        ...apiConfig,
+    })
+}
+
 // Authorizes app on install
 export function getBCAuth(query: QueryParams) {
     return bigcommerce.authorize(query);

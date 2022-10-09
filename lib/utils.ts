@@ -10,7 +10,7 @@ export const handlePagination = async (callback: any, initUrl: string):Promise<P
     data.forEach(entry => {
       batchData.push(entry)
     })
-    if(meta.pagination.links.next){
+    if(meta.pagination.links?.next){
       initUrl=baseUrl+meta.pagination.links.next;
     }else{
       finished=true
